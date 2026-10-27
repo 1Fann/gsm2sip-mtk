@@ -7,7 +7,9 @@
 用于从固定版本的 [GSM2SIP](https://github.com/OriginStackHQ/GSM2SIP)
 生成仅包含 **BakaSU Root Shell 适配**和 **MT6893 实验性音频配置**的本地构建。
 
-**本仓库开源的是适配工具和模块模板。上游未声明许可证，因此不重新发布上游源码或衍生 APK；Releases 也只提供本仓库工具的源码。**
+**本仓库开源的是适配工具和模块模板。签名 APK 经维护者确认分发授权后在 [Releases](https://github.com/1Fann/gsm2sip-mtk/releases) 提供；上游源码仍直接从原项目获取，MIT 许可证不覆盖上游整体。**
+
+下载 `gsm2sip-mtk.apk` 并用 `SHA256SUMS` 核对。APK 使用稳定本地签名。
 
 ## 只保留两项运行时改动
 
@@ -43,7 +45,9 @@ pwsh ./tools/Build.ps1 -SdkDir /path/to/android-sdk
 
 源码直接从上游固定提交下载，并校验归档 SHA256。
 准备命令可重复执行；不符合预期的本地源码改动会使适配失败，而不是被静默覆盖。
-生成的源码和构建产物都位于 `.work/`，不应提交或重新分发。
+生成的源码和普通构建产物位于已忽略的 `.work/`。
+已确认具有分发授权的签名 APK，使用 `tools/Stage-Release.ps1` 存入专用 `releases/` 输入目录，
+提交后由 Actions 校验完整性并上传到 Releases；不上传签名私钥。
 
 发布版默认不签名。需要在手机安装时，按照 [构建说明](docs/BUILD.md) 使用自己的私钥签名，
 再生成本地模块：

@@ -7,7 +7,9 @@ Repository: `1Fann/gsm2sip-mtk`. The current target is MT6893; support for all M
 Prepare a local build of pinned [GSM2SIP](https://github.com/OriginStackHQ/GSM2SIP)
 with only **BakaSU root-shell support** and an **experimental MT6893 audio profile**.
 
-**This repository open-sources the adaptation tools and module templates. Upstream has no declared license, so neither its source snapshot nor derived APKs are redistributed. Releases contain this toolkit's source only.**
+**This repository open-sources the adaptation tools and module templates. A signed APK is provided in [Releases](https://github.com/1Fann/gsm2sip-mtk/releases) with distribution permission confirmed by the maintainer. Upstream source is fetched from its original repository; MIT does not apply to all upstream code.**
+
+Download `gsm2sip-mtk.apk` and verify it with `SHA256SUMS`. It uses a stable local signer.
 
 ## Exactly two runtime adaptations
 
@@ -46,8 +48,10 @@ pwsh ./tools/Build.ps1 -SdkDir /path/to/android-sdk
 
 Preparation downloads the pinned archive directly from upstream and verifies
 its SHA256. It is repeatable and rejects unexpected local source edits.
-Fetched source and local build outputs stay under ignored `.work/` and must
-not be committed or redistributed.
+Fetched source and ordinary build outputs stay under ignored `.work/`.
+Explicitly authorized signed APKs can be staged with `tools/Stage-Release.ps1`
+under `releases/`; Actions verifies and publishes them as Release assets.
+Private signing keys are never uploaded.
 
 Release builds are unsigned by default. Follow [the build guide](docs/BUILD.md)
 to supply your own signing key, then create a local module:

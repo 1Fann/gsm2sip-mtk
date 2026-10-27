@@ -12,22 +12,25 @@ module templates and documentation. It does not license GSM2SIP itself.
 
 At that commit, the upstream tree has no LICENSE, COPYING or NOTICE file;
 its README does not declare a software license. The GitHub repository API
-also reports no detected license. This repository therefore contains neither
-an upstream source snapshot nor derived APKs, module binaries, screenshots,
-icons, audio tools or signing keys. Source is fetched directly from upstream
+also reports no detected license. This repository does not include an upstream
+source snapshot, module binaries, screenshots, icons, audio tools or signing keys.
+The maintainer has confirmed permission to distribute the signed APK, published
+as a Release asset. Verified binary inputs are stored under `releases/` and are
+outside the toolkit's MIT license. Source is fetched directly from upstream
 into the ignored `.work/` directory when a user chooses to prepare a build.
 
 该提交未包含 LICENSE、COPYING 或 NOTICE 文件，README 也未声明软件许可证；
-GitHub 接口未识别到许可证。因此，本仓库不包含上游源码快照、衍生 APK、
-带 APK 的模块包、上游截图、图标、音频工具或签名密钥。
+GitHub 接口未识别到许可证。本仓库不包含上游源码快照、带 APK 的模块包、上游截图、
+图标、音频工具或签名密钥。维护者已确认签名 APK 的分发授权，APK 作为 Release
+附件提供，经校验的二进制输入保存在 `releases/`，不适用工具的 MIT 许可证。
 使用者执行准备命令时，才会直接从上游获取源码到已忽略的 `.work/` 目录。
 
-Build outputs are for local evaluation. This toolkit does not grant permission
-to redistribute upstream code or derived binaries. Reassess that separately
-if the upstream author supplies a license or distribution permission.
+The toolkit does not grant blanket permission to redistribute upstream code or
+all derived binaries. The separately authorized APK does not change upstream's
+general license status.
 
-构建产物用于本地验证。本工具不授予重新分发上游代码或衍生二进制的权利；
-若作者之后补充许可证或分发授权，可再相应调整发布范围。
+本工具不授予对上游代码或所有衍生二进制的通用分发权；单独获准分发 APK
+不改变上游仓库的一般许可状态。
 
 This is an independent adaptation project, not an upstream release or endorsement.
 

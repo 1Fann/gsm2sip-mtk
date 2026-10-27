@@ -95,6 +95,22 @@ requests for phone roles and battery settings when configuring the gateway.
 
 ## Validation and rollback / 验证与回退
 
+For an authorized signed release, stage the APK before committing:
+
+有分发授权的签名 APK 可通过下列命令准备发布：
+
+```powershell
+pwsh ./tools/Stage-Release.ps1 -ApkPath /path/to/your-signed.apk
+```
+
+Commit `releases/` and use a commit message beginning with `Release ` on `main`.
+Actions reassembles the binary inputs, verifies the complete APK SHA256, and
+uploads `gsm2sip-mtk.apk` plus `SHA256SUMS` through GitHub's Release asset API.
+
+将 `releases/` 提交到 `main`，提交说明以 `Release ` 开头。
+Actions 会重组二进制输入、校验完整 APK 的 SHA256，并通过 Release 资产接口
+上传 `gsm2sip-mtk.apk` 和 `SHA256SUMS`。
+
 First verify SIP registration, then test one controlled cellular call and both
 audio directions. An iPhone/Asterisk echo test proves only the SIP media path.
 Keep your previous signed APK/module locally. Do not uninstall the package just

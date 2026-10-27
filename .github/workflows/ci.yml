@@ -24,6 +24,11 @@ jobs:
           ./tools/Prepare-Source.ps1
           ./tools/Prepare-Source.ps1
       - name: Install Android build components
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - name: Install platform and build tools
         run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0'
       - name: Compile and run release lint
         shell: pwsh
@@ -33,7 +38,7 @@ jobs:
         run: |
           $unexpected = @(git ls-files -- .work private '*.apk' '*.zip' '*.jks' '*.keystore')
           if ($unexpected.Count) { throw 'Unexpected private/source/binary file in Git' }
-      # Deliberately no upload-artifact step for upstream-derived APKs/source.
+      # The stable local signer is retained; no private signing key is uploaded.
 
   release-tools:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release ')
@@ -42,7 +47,7 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - name: Publish toolkit ZIP and checksum as Release assets
+      - name: Publish the prepared signed APK and checksum
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -50,21 +55,44 @@ jobs:
         run: |
           $pin = Get-Content upstream.json -Raw | ConvertFrom-Json
           $tag = 'v' + $pin.versionName
-          $archive = 'gsm2sip-mtk-tools-' + $tag + '.zip'
-          git archive --format=zip --output $archive HEAD
-          if ($LASTEXITCODE) { throw 'Toolkit archive failed' }
-          $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          [IO.File]::WriteAllText((Join-Path $PWD 'SHA256SUMS'), "$hash  $archive`n", [Text.UTF8Encoding]::new($false))
-          $existing = gh release view $tag --json assets 2>$null
+          $directory = Join-Path 'releases' $tag
+          $manifest = Get-Content (Join-Path $directory 'manifest.json') -Raw | ConvertFrom-Json
+          $output = Join-Path $PWD '.work/release'
+          New-Item -ItemType Directory -Force $output | Out-Null
+          $apk = Join-Path $output $manifest.name
+          $stream = [IO.File]::Create($apk)
+          try {
+            foreach ($part in $manifest.parts) {
+              $bytes = [IO.File]::ReadAllBytes((Join-Path $directory $part.file))
+              if ($bytes.Length -ne $part.size) { throw 'Release input size mismatch' }
+              $stream.Write($bytes, 0, $bytes.Length)
+            }
+          } finally { $stream.Dispose() }
+          $hash = (Get-FileHash $apk -Algorithm SHA256).Hash.ToLowerInvariant()
+          if ($hash -ne $manifest.sha256 -or (Get-Item $apk).Length -ne $manifest.size) { throw 'Signed APK checksum mismatch' }
+          $checksumLines = @("$hash  $($manifest.name)")
+          $existing = gh api "repos/$env:GH_REPO/releases/tags/$tag" 2>$null
           if ($LASTEXITCODE -eq 0) {
-            $names = @(($existing | ConvertFrom-Json).assets.name)
-            foreach ($file in @($archive, 'SHA256SUMS')) {
-              if ($file -notin $names) {
-                gh release upload $tag $file
-                if ($LASTEXITCODE) { throw 'Release asset upload failed' }
+            $release = $existing | ConvertFrom-Json
+            $oldApk = @($release.assets | Where-Object name -eq $manifest.name)
+            if ($oldApk.Count -eq 0) {
+              gh release upload $tag $apk
+              if ($LASTEXITCODE) { throw 'APK asset upload failed' }
+            } elseif ($oldApk[0].digest -ne ('sha256:' + $hash)) {
+              throw 'Existing APK differs; refusing to overwrite it'
+            }
+            foreach ($asset in $release.assets) {
+              if ($asset.name -like 'gsm2sip-mtk-tools-*.zip' -and $asset.digest -match '^sha256:([a-f0-9]{64})$') {
+                $checksumLines += "$($Matches[1])  $($asset.name)"
               }
             }
           } else {
-            gh release create $tag $archive SHA256SUMS --target $env:GITHUB_SHA --title "GSM2SIP MTK $tag" --notes-file docs/RELEASE_NOTES.md
-            if ($LASTEXITCODE) { throw 'Release publication failed' }
+            gh release create $tag $apk --target $env:GITHUB_SHA --title "GSM2SIP MTK $tag" --notes-file docs/RELEASE_NOTES.md
+            if ($LASTEXITCODE) { throw 'Release creation failed' }
           }
+          $sums = Join-Path $output 'SHA256SUMS'
+          [IO.File]::WriteAllText($sums, ($checksumLines -join "`n") + "`n", [Text.UTF8Encoding]::new($false))
+          gh release upload $tag $sums --clobber
+          if ($LASTEXITCODE) { throw 'Checksum asset upload failed' }
+          gh release edit $tag --title "GSM2SIP MTK $tag" --notes-file docs/RELEASE_NOTES.md
+          if ($LASTEXITCODE) { throw 'Release notes update failed' }

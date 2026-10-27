@@ -1,0 +1,94 @@
+{
+  "versionName": "1.2.0-bakasu-mt6893.2",
+  "versionCode": 427,
+  "name": "gsm2sip-mtk.apk",
+  "sha256": "c3bbc975e61eccb45464e7e50c4fe3c2b810cbc1dbd3d7ba1449003162b2dca8",
+  "size": 10859078,
+  "parts": [
+    {
+      "file": "apk-00.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-01.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-02.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-03.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-04.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-05.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-06.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-07.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-08.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-09.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-10.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-11.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-12.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-13.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-14.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-15.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-16.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-17.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-18.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-19.part",
+      "size": 524286
+    },
+    {
+      "file": "apk-20.part",
+      "size": 373358
+    }
+  ],
+  "signerCertificateSha256": "6e446e4d7951e123472a703a465c7c48e3be3ebf2435971c213d59ad5d1af01a"
+}
