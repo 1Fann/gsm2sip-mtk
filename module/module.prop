@@ -1,0 +1,6 @@
+id=gsm2sip_bakasu_test
+name=GSM2SIP BakaSU MT6893
+version=1.2.0-bakasu-mt6893.2
+versionCode=427
+author=1Fann (adaptation tooling); OriginStackHQ (upstream GSM2SIP)
+description=BakaSU global-mount root shell and experimental MT6893 profile. Other APK behavior follows pinned upstream, including permission-controller and SMS-notification handling. Privileged APK/allowlist only; no extra global boot/property scripts.

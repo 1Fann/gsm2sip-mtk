@@ -1,0 +1,15 @@
+{
+  "repository": "OriginStackHQ/GSM2SIP",
+  "commit": "0b0a1a68a6e66c8291e053cd70430639df020877",
+  "archiveUrl": "https://codeload.github.com/OriginStackHQ/GSM2SIP/zip/0b0a1a68a6e66c8291e053cd70430639df020877",
+  "archiveSha256": "deba66bd238d41bccb9232c9dcfa23a60d04604ba9f463f166963c9f468ff60d",
+  "sourceDirectory": "GSM2SIP-0b0a1a68a6e66c8291e053cd70430639df020877",
+  "versionName": "1.2.0-bakasu-mt6893.2",
+  "versionCode": 427,
+  "compileSdk": 35,
+  "gradleVersion": "9.1.0",
+  "baselineFiles": {
+    "app/src/main/java/com/callagent/gateway/RootShell.kt": "a7771108d150c48a220e8ab6e86c321abbe9d9eb10665a250bbf4d9d53eab8da",
+    "app/src/main/java/com/callagent/gateway/DeviceProfile.kt": "d0cdccb80ad7e7be87578ed05782b95e30cff154482e19e0609a3ca37d677772"
+  }
+}

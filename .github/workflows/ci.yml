@@ -1,0 +1,70 @@
+name: Verify and build local adaptation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify archive and prepare the two runtime adaptations
+        shell: pwsh
+        run: |
+          ./tools/Prepare-Source.ps1
+          ./tools/Prepare-Source.ps1
+      - name: Install Android build components
+        run: sdkmanager 'platforms;android-35' 'build-tools;36.0.0'
+      - name: Compile and run release lint
+        shell: pwsh
+        run: ./tools/Build.ps1 -SdkDir $env:ANDROID_HOME
+      - name: Confirm fetched source and binaries are ignored
+        shell: pwsh
+        run: |
+          $unexpected = @(git ls-files -- .work private '*.apk' '*.zip' '*.jks' '*.keystore')
+          if ($unexpected.Count) { throw 'Unexpected private/source/binary file in Git' }
+      # Deliberately no upload-artifact step for upstream-derived APKs/source.
+
+  release-tools:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'Release ')
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Publish toolkit ZIP and checksum as Release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: pwsh
+        run: |
+          $pin = Get-Content upstream.json -Raw | ConvertFrom-Json
+          $tag = 'v' + $pin.versionName
+          $archive = 'gsm2sip-mtk-tools-' + $tag + '.zip'
+          git archive --format=zip --output $archive HEAD
+          if ($LASTEXITCODE) { throw 'Toolkit archive failed' }
+          $hash = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+          [IO.File]::WriteAllText((Join-Path $PWD 'SHA256SUMS'), "$hash  $archive`n", [Text.UTF8Encoding]::new($false))
+          $existing = gh release view $tag --json assets 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            $names = @(($existing | ConvertFrom-Json).assets.name)
+            foreach ($file in @($archive, 'SHA256SUMS')) {
+              if ($file -notin $names) {
+                gh release upload $tag $file
+                if ($LASTEXITCODE) { throw 'Release asset upload failed' }
+              }
+            }
+          } else {
+            gh release create $tag $archive SHA256SUMS --target $env:GITHUB_SHA --title "GSM2SIP MTK $tag" --notes-file docs/RELEASE_NOTES.md
+            if ($LASTEXITCODE) { throw 'Release publication failed' }
+          }

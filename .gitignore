@@ -1,0 +1,16 @@
+.work/
+private/
+local.properties
+.gradle/
+**/build/
+*.apk
+*.aab
+*.zip
+*.jks
+*.keystore
+*.password
+*.log
+*.gz
+*.hprof
+.env
+.env.*
