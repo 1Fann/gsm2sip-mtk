@@ -81,10 +81,10 @@ jobs:
             } elseif ($oldApk[0].digest -ne ('sha256:' + $hash)) {
               throw 'Existing APK differs; refusing to overwrite it'
             }
-            foreach ($asset in $release.assets) {
-              if ($asset.name -like 'gsm2sip-mtk-tools-*.zip' -and $asset.digest -match '^sha256:([a-f0-9]{64})$') {
-                $checksumLines += "$($Matches[1])  $($asset.name)"
-              }
+            $obsoleteName = 'gsm2sip-mtk-tools-' + $tag + '.zip'
+            foreach ($asset in @($release.assets | Where-Object name -eq $obsoleteName)) {
+              gh api --method DELETE "repos/$env:GH_REPO/releases/assets/$($asset.id)"
+              if ($LASTEXITCODE) { throw 'Obsolete toolkit ZIP removal failed' }
             }
           } else {
             gh release create $tag $apk --target $env:GITHUB_SHA --title "GSM2SIP MTK $tag" --notes-file docs/RELEASE_NOTES.md
