@@ -28,7 +28,7 @@
 
 ## 验证状态
 
-- 适配目标：`chopin / MediaTek MT6893`，Android 12 及以上，BakaSU/KernelSU。
+- 适配目标：`红米 Note 10 Pro / MediaTek MT6893`，Android 12 及以上，BakaSU/KernelSU。
 - 实机环境为 Android 17 移植系统；手机营销名称可能对应不同硬件，以 SoC 和代号为准。
 - GSM2SIP 网关曾完成局域网 SIP 注册；iPhone 与本机 Asterisk 的回声测试已通过。
 - **真实蜂窝通话、SIM 指定呼出和 MT6893 双向通话音频尚未验证。** 回声测试不会经过蜂窝音频通道。
