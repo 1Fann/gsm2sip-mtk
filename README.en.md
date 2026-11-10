@@ -1,76 +1,29 @@
 # GSM2SIP MediaTek adaptation
 
-[简体中文](README.md) · [Change scope](docs/CHANGES.md) · [Build and installation](docs/BUILD.md) · [License scope](NOTICE.md)
+[中文](README.md) | English
 
-Repository: `1Fann/gsm2sip-mtk`. The current target is MT6893; support for all MediaTek SoCs is not implied.
+GSM2SIP adaptation tools and module templates for MT6893.
 
-Prepare a local build of pinned [GSM2SIP](https://github.com/OriginStackHQ/GSM2SIP)
-with only **BakaSU root-shell support** and an **experimental MT6893 audio profile**.
+[Download APK](https://github.com/1Fann/gsm2sip-mtk/releases/latest) · [Release notes](https://github.com/1Fann/gsm2sip-mtk/releases)
 
-**This repository open-sources the adaptation tools and module templates. A signed APK is provided in [Releases](https://github.com/1Fann/gsm2sip-mtk/releases) with distribution permission confirmed by the maintainer. Upstream source is fetched from its original repository; MIT does not apply to all upstream code.**
+## Features
 
-Download `gsm2sip-mtk.apk` and verify it with `SHA256SUMS`. It uses a stable local signer.
+- BakaSU global-mount root shell compatibility.
+- An experimental MT6893 cellular-audio profile.
+- Pinned-source verification, repeatable builds and minimal privileged-module templates.
 
-## Exactly two runtime adaptations
+## Getting started
 
-| File | Adaptation |
-|---|---|
-| `RootShell.kt` | Use `su -M` for persistent and one-shot root commands to access BakaSU's global mount namespace. |
-| `DeviceProfile.kt` | Select an experimental Android telephony audio profile for `mt6893`, retaining upstream capture fallbacks. |
+Experimental target: MT6893/chopin, Android 12+ and BakaSU/KernelSU, not all MediaTek devices. The APK requires a privileged module. Cellular two-way audio and SIM-specific outgoing calls remain unverified.
 
-Every other upstream Kotlin, manifest and resource file remains byte-identical.
-Separate build-metadata changes select API 35, Gradle 9.1.0, optional private
-signing and a distinct version identifier.
+Download the release, follow the installation guide, grant the requested permissions and configure your own account locally. Keep the same signing identity when upgrading to retain app data.
 
-The earlier test build's permission-controller restrictions, preservation of
-default SMS notifications, autoconnect-off default, deferred permission/role
-requests and microphone-fallback restriction have all been removed.
-**Upstream permission-controller handling, SMS-notification handling, autoconnect
-defaults and capture fallbacks therefore apply again.** Existing saved settings
-are not reset by restoring defaults.
+## Documentation
 
-## Validation status
+- [Build and installation](docs/BUILD.md)
+- [Adaptation scope](docs/CHANGES.md)
+- [Distribution and licensing](NOTICE.md)
 
-- Target: `chopin / MediaTek MT6893`, Android 12+, BakaSU/KernelSU.
-- The inspected phone runs an Android 17 port. Check the SoC and codename rather than relying on its marketing name.
-- The gateway has registered to a local SIP server, and an iPhone/Asterisk echo test has passed.
-- **Cellular calls, SIM-specific outgoing calls and MT6893 two-way cellular audio remain unverified.** An Asterisk echo test does not exercise the cellular audio bridge.
-- No SIP server, personal domain, credentials, SIM numbers or device logs are included.
+## License
 
-## Prepare and build locally
-
-Requirements: PowerShell 7, JDK 21, Android SDK platform 35 and Gradle 9.1.0.
-
-```powershell
-pwsh ./tools/Prepare-Source.ps1
-pwsh ./tools/Build.ps1 -SdkDir /path/to/android-sdk
-```
-
-Preparation downloads the pinned archive directly from upstream and verifies
-its SHA256. It is repeatable and rejects unexpected local source edits.
-Fetched source and ordinary build outputs stay under ignored `.work/`.
-Explicitly authorized signed APKs can be staged with `tools/Stage-Release.ps1`
-under `releases/`; Actions verifies and publishes them as Release assets.
-Private signing keys are never uploaded.
-
-Release builds are unsigned by default. Follow [the build guide](docs/BUILD.md)
-to supply your own signing key, then create a local module:
-
-```powershell
-pwsh ./tools/Build-Module.ps1 -ApkPath /path/to/your-signed.apk
-```
-
-The module contains only the privileged APK and permission allowlist. It adds
-no global audio properties, boot-time forced grants or SMS rate changes.
-Root, a compatible mounting component and a reboot are still required for
-initial installation.
-
-## Provenance and version
-
-- Upstream: `OriginStackHQ/GSM2SIP`
-- Pinned commit: `0b0a1a68a6e66c8291e053cd70430639df020877`
-- Local APK version: `1.2.0-bakasu-mt6893.2` / `427`
-- Original toolkit: MIT; upstream licensing is separate. See [NOTICE](NOTICE.md).
-
-No signing keys are distributed. Preserve your own key for future upgrades;
-Android cannot directly replace an existing package with a different signer.
+The adaptation toolkit is MIT-licensed; upstream GSM2SIP licensing applies separately. Authorized APKs are distributed through Releases. This does not relicense all upstream code as MIT; see [NOTICE.md](NOTICE.md).

@@ -1,69 +1,29 @@
 # GSM2SIP 联发科适配
 
-[English](README.en.md) · [改动范围](docs/CHANGES.md) · [构建与安装](docs/BUILD.md) · [授权范围](NOTICE.md)
+中文 | [English](README.en.md)
 
-仓库：`1Fann/gsm2sip-mtk`。当前适配目标为 MT6893，不代表支持全部联发科芯片。
+面向 MT6893 的 GSM2SIP 适配工具与模块模板。
 
-用于从固定版本的 [GSM2SIP](https://github.com/OriginStackHQ/GSM2SIP)
-生成仅包含 **BakaSU Root Shell 适配**和 **MT6893 实验性音频配置**的本地构建。
+[下载安装包](https://github.com/1Fann/gsm2sip-mtk/releases/latest) · [更新说明](https://github.com/1Fann/gsm2sip-mtk/releases)
 
-**本仓库开源的是适配工具和模块模板。签名 APK 经维护者确认分发授权后在 [Releases](https://github.com/1Fann/gsm2sip-mtk/releases) 提供；上游源码仍直接从原项目获取，MIT 许可证不覆盖上游整体。**
+## 功能
 
-下载 `gsm2sip-mtk.apk` 并用 `SHA256SUMS` 核对。APK 使用稳定本地签名。
+- BakaSU 全局挂载 Root Shell 适配。
+- MT6893 实验性通话音频配置。
+- 固定上游源码校验、可重复构建和最小特权模块模板。
 
-## 只保留两项运行时改动
+## 使用
 
-| 文件 | 改动 |
-|---|---|
-| `RootShell.kt` | 持久和一次性 Root Shell 使用 `su -M`，让 BakaSU 命令进入全局挂载空间。 |
-| `DeviceProfile.kt` | 为 `mt6893` 添加实验性系统通话音频配置，保留上游音频采集回退逻辑。 |
+实验目标为 MT6893／chopin、Android 12+ 与 BakaSU／KernelSU，不代表支持全部联发科手机。APK 需配套特权模块；真实蜂窝双向音频和指定 SIM 呼出尚未验证。
 
-其余上游 Kotlin、AndroidManifest 和资源文件逐字节保持不变。
-构建元数据另有调整：API 35、Gradle 9.1.0、本地可选签名和独立版本号。
+从 Releases 下载，按安装说明完成授权，在本机填写自己的账号和连接参数。同包名、同签名的版本可覆盖升级并保留数据。
 
-之前测试版增加的权限管理器处理限制、短信通知保留、默认关闭自动连接、
-延后权限请求、禁止环境麦克风回退等改动，均不再包含。
-**这意味着新版恢复上游的权限管理器处理、短信通知处理、自动连接默认值和音频回退行为。**
-恢复默认值不会重置已经保存的个人设置。
+## 文档
 
-## 验证状态
+- [构建与安装](docs/BUILD.md)
+- [改动范围](docs/CHANGES.md)
+- [分发与授权](NOTICE.md)
 
-- 适配目标：`红米 Note 10 Pro / MediaTek MT6893`，Android 12 及以上，BakaSU/KernelSU。
-- 实机环境为 Android 17 移植系统；手机营销名称可能对应不同硬件，以 SoC 和代号为准。
-- GSM2SIP 网关曾完成局域网 SIP 注册；iPhone 与本机 Asterisk 的回声测试已通过。
-- **真实蜂窝通话、SIM 指定呼出和 MT6893 双向通话音频尚未验证。** 回声测试不会经过蜂窝音频通道。
-- 不含 SIP 服务器、域名、账号、密码、SIM 号码或任何个人设备日志。
+## 许可证
 
-## 本地准备与构建
-
-需要 PowerShell 7、JDK 21、Android SDK 平台 35，以及 Gradle 9.1.0。
-
-```powershell
-pwsh ./tools/Prepare-Source.ps1
-pwsh ./tools/Build.ps1 -SdkDir /path/to/android-sdk
-```
-
-源码直接从上游固定提交下载，并校验归档 SHA256。
-准备命令可重复执行；不符合预期的本地源码改动会使适配失败，而不是被静默覆盖。
-生成的源码和普通构建产物位于已忽略的 `.work/`。
-已确认具有分发授权的签名 APK，使用 `tools/Stage-Release.ps1` 存入专用 `releases/` 输入目录，
-提交后由 Actions 校验完整性并上传到 Releases；不上传签名私钥。
-
-发布版默认不签名。需要在手机安装时，按照 [构建说明](docs/BUILD.md) 使用自己的私钥签名，
-再生成本地模块：
-
-```powershell
-pwsh ./tools/Build-Module.ps1 -ApkPath /path/to/your-signed.apk
-```
-
-模块仅包含 APK 和特权权限清单，不附加全局音频属性、开机授权脚本或短信限额修改。
-安装仍需 Root、兼容的挂载组件及重启；具体步骤见构建说明。
-
-## 来源与版本
-
-- 上游：`OriginStackHQ/GSM2SIP`
-- 固定提交：`0b0a1a68a6e66c8291e053cd70430639df020877`
-- 本地 APK：`1.2.0-bakasu-mt6893.2` / `427`
-- 原始适配工具：MIT；上游授权单独适用，见 [NOTICE](NOTICE.md)。
-
-私钥不随项目发布。不同签名的 APK 不能直接覆盖已有安装；更新时请保留自己的签名密钥。
+适配工具采用 MIT；上游 GSM2SIP 的授权单独适用。经维护者确认分发授权的 APK 在 Releases 提供，不能将上游整体视为 MIT 项目，见 [NOTICE.md](NOTICE.md)。
